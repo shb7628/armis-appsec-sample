@@ -125,11 +125,19 @@ jobs:
           <!-- SECURITY-SUMMARY-END -->' README.md
           rm -f README.md.bak
 
-      - name: Commit README update
+      - name: Save security artifacts to repo
+        if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p .security
+          [ -f sbom.cdx.json ] && cp sbom.cdx.json .security/
+          [ -f vex.cdx.json ] && cp vex.cdx.json .security/
+          [ -f armis-results.sarif ] && cp armis-results.sarif .security/scan-results.sarif
+
+      - name: Commit security artifacts and README
         if: always() && steps.check-sarif.outputs.valid == 'true' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git diff --staged --quiet || git commit -m "Update security scan summary [skip ci]"
+          git add README.md .security/
+          git diff --staged --quiet || git commit -m "Update security scan results [skip ci]"
           git push || echo "Nothing to push"
