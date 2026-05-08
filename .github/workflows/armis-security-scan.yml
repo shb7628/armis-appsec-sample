@@ -25,8 +25,11 @@ jobs:
 
       - name: Run Armis CLI scan
         uses: ArmisSecurity/armis-cli@main
+        env:
+          ARMIS_CLIENT_ID: ${{ secrets.ARMIS_CLIENT_ID }}
+          ARMIS_CLIENT_SECRET: ${{ secrets.ARMIS_CLIENT_SECRET }}
         with:
           scan-type: repo
-          api-token: ${{ secrets.ARMIS_API_TOKEN }}
-          tenant-id: ${{ secrets.ARMIS_TENANT_ID }}
+          api-token: unused-jwt-auth
+          tenant-id: unused-jwt-auth
           fail-on: CRITICAL
